@@ -43,18 +43,18 @@ func TestScribe(t *testing.T) {
 		{
 			s.BeginDescribe("Permissions")
 			s.EndDescribe()
-			s.Done("Enable create private repos")
-			s.Done("Enable create public repos")
-			s.Done("Base permissions [admin]")
+			s.Print("Enable create private repos")
+			s.Print("Enable create public repos")
+			s.Print("Base permissions [admin]")
 		}
 
 		{
 			s.BeginDescribe("Members")
 			s.EndDescribe()
-			s.Done("Adding John")
-			s.Done("Adding Jane")
-			s.Done("Adding Jim")
-			s.Done("Adding Joe")
+			s.Print("Adding John")
+			s.Print("Adding Jane")
+			s.Print("Adding Jim")
+			s.Print("Adding Joe")
 		}
 
 		{
@@ -62,13 +62,13 @@ func TestScribe(t *testing.T) {
 			{
 				s.BeginDescribe("Admins")
 				s.EndDescribe()
-				s.Done("Adding John")
-				s.Done("Adding Jane")
+				s.Print("Adding John")
+				s.Print("Adding Jane")
 
 				s.BeginDescribe("Developers")
 				s.EndDescribe()
-				s.Done("Adding Jim")
-				s.Done("Adding Joe")
+				s.Print("Adding Jim")
+				s.Print("Adding Joe")
 			}
 			s.EndDescribe()
 		}
@@ -78,16 +78,16 @@ func TestScribe(t *testing.T) {
 			{
 				s.BeginDescribe("Repo 1")
 				s.EndDescribe()
-				s.Done("Create repo 1")
-				s.Done("Set branch protection")
-				s.Done("Set default branch to 'main'")
+				s.Print("Create repo 1")
+				s.Print("Set branch protection")
+				s.Print("Set default branch to 'main'")
 			}
 			{
 				s.BeginDescribe("Repo 2")
 				s.EndDescribe()
-				s.Done("Create repo 2")
-				s.Done("Set branch protection")
-				s.Done("Set default branch to 'foo'")
+				s.Print("Create repo 2")
+				s.Print("Set branch protection")
+				s.Print("Set default branch to 'foo'")
 			}
 			s.EndDescribe()
 		}
@@ -106,7 +106,7 @@ func TestScribe(t *testing.T) {
 			Describe: func(desc string) string {
 				return "\033[1;36m" + desc + "\033[0m"
 			},
-			Done: NoopDecorator,
+			Print: NoopDecorator,
 		}
 
 		s := NewScribe(mockWrite, theme)
@@ -116,18 +116,18 @@ func TestScribe(t *testing.T) {
 		{
 			s.BeginDescribe("Permissions")
 			s.EndDescribe()
-			s.Done("Enable create private repos")
-			s.Done("Enable create public repos")
-			s.Done("Base permissions [admin]")
+			s.Print("Enable create private repos")
+			s.Print("Enable create public repos")
+			s.Print("Base permissions [admin]")
 		}
 
 		{
 			s.BeginDescribe("Members")
 			s.EndDescribe()
-			s.Done("Adding John")
-			s.Done("Adding Jane")
-			s.Done("Adding Jim")
-			s.Done("Adding Joe")
+			s.Print("Adding John")
+			s.Print("Adding Jane")
+			s.Print("Adding Jim")
+			s.Print("Adding Joe")
 		}
 
 		{
@@ -135,13 +135,13 @@ func TestScribe(t *testing.T) {
 			{
 				s.BeginDescribe("Admins")
 				s.EndDescribe()
-				s.Done("Adding John")
-				s.Done("Adding Jane")
+				s.Print("Adding John")
+				s.Print("Adding Jane")
 
 				s.BeginDescribe("Developers")
 				s.EndDescribe()
-				s.Done("Adding Jim")
-				s.Done("Adding Joe")
+				s.Print("Adding Jim")
+				s.Print("Adding Joe")
 			}
 			s.EndDescribe()
 		}
@@ -151,16 +151,16 @@ func TestScribe(t *testing.T) {
 			{
 				s.BeginDescribe("Repo 1")
 				s.EndDescribe()
-				s.Done("Create repo 1")
-				s.Done("Set branch protection")
-				s.Done("Set default branch to 'main'")
+				s.Print("Create repo 1")
+				s.Print("Set branch protection")
+				s.Print("Set default branch to 'main'")
 			}
 			{
 				s.BeginDescribe("Repo 2")
 				s.EndDescribe()
-				s.Done("Create repo 2")
-				s.Done("Set branch protection")
-				s.Done("Set default branch to 'foo'")
+				s.Print("Create repo 2")
+				s.Print("Set branch protection")
+				s.Print("Set default branch to 'foo'")
 			}
 			s.EndDescribe()
 		}
