@@ -9,17 +9,19 @@ import (
 type Scribe struct {
 	writer io.Writer
 	level  int
+	theme  *Theme
 }
 
-func NewScribe(writer io.Writer) Scriber {
+func NewScribe(writer io.Writer, theme *Theme) Scriber {
 	return &Scribe{
 		writer: writer,
+		theme:  theme,
 	}
 }
 
 func (s *Scribe) BeginDescribe(desc string) {
 	s.println()
-	s.printt(desc)
+	s.printt(s.theme.Describe(desc))
 	s.level++
 }
 
@@ -29,7 +31,7 @@ func (s *Scribe) EndDescribe() {
 
 func (s *Scribe) Done(done string) {
 	s.level++
-	s.printt(done)
+	s.printt(s.theme.Done(done))
 	s.level--
 }
 
