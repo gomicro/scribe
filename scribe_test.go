@@ -1,6 +1,7 @@
 package scribe
 
 import (
+	"bytes"
 	"testing"
 
 	"github.com/alecthomas/assert"
@@ -92,10 +93,18 @@ func TestScribe(t *testing.T) {
 			s.EndDescribe()
 		}
 
+		{
+			s.BeginDescribe("Output")
+			{
+				s.PrintLines(bytes.NewBufferString("Output line 1\nOutput line 2\n"))
+			}
+			s.EndDescribe()
+		}
+
 		s.EndDescribe()
 
 		a := string(mockWrite.Written())
-		e := "\nOrganization\n\n  Permissions\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  Members\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  Teams\n\n    Admins\n      Adding John\n      Adding Jane\n\n    Developers\n      Adding Jim\n      Adding Joe\n\n  Repositories\n\n    Repo 1\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    Repo 2\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n"
+		e := "\nOrganization\n\n  Permissions\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  Members\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  Teams\n\n    Admins\n      Adding John\n      Adding Jane\n\n    Developers\n      Adding Jim\n      Adding Joe\n\n  Repositories\n\n    Repo 1\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    Repo 2\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n\n  Output\n      Output line 1\n      Output line 2\n\n"
 		assert.Equal(t, e, a)
 	})
 
