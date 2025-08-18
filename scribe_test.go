@@ -104,10 +104,18 @@ func TestScribe(t *testing.T) {
 			s.EndDescribe()
 		}
 
+		{
+			s.BeginDescribe("Errors")
+			{
+				s.Error(errors.New("something went wrong"))
+			}
+			s.EndDescribe()
+		}
+
 		s.EndDescribe()
 
 		a := string(mockWrite.Written())
-		e := "\nOrganization\n\n  Permissions\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  Members\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  Teams\n\n    Admins\n      Adding John\n      Adding Jane\n\n    Developers\n      Adding Jim\n      Adding Joe\n\n  Repositories\n\n    Repo 1\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    Repo 2\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n\n  Output\n      Output line 1\n      Output line 2\n\n"
+		e := "\nOrganization\n\n  Permissions\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  Members\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  Teams\n\n    Admins\n      Adding John\n      Adding Jane\n\n    Developers\n      Adding Jim\n      Adding Joe\n\n  Repositories\n\n    Repo 1\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    Repo 2\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n\n  Output\n      Output line 1\n      Output line 2\n\n\n  Errors\n      something went wrong\n"
 		assert.Equal(t, e, a)
 	})
 
