@@ -1,6 +1,8 @@
 package scribe
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -32,6 +34,19 @@ func (s *Scribe) EndDescribe() {
 func (s *Scribe) Print(str string) {
 	s.level++
 	s.printt(s.theme.Print(str))
+	s.level--
+}
+
+func (s *Scribe) PrintLines(buf *bytes.Buffer) {
+	scanner := bufio.NewScanner(buf)
+
+	s.level++
+
+	for scanner.Scan() {
+		s.printt(s.theme.Print(scanner.Text()))
+	}
+
+	s.println()
 	s.level--
 }
 
