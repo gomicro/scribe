@@ -50,6 +50,12 @@ func (s *Scribe) PrintLines(buf *bytes.Buffer) {
 	s.level--
 }
 
+func (s *Scribe) Error(err error) {
+	s.level++
+	s.printt(s.theme.Error(err))
+	s.level--
+}
+
 func (s *Scribe) print(str string) {
 	fmt.Fprintf(s.writer, "%v\n", str)
 }
