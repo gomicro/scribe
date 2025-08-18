@@ -7,4 +7,5 @@ type Scriber interface {
 	EndDescribe()
 	Print(done string)
 	PrintLines(buf *bytes.Buffer)
+	Error(err error)
 }

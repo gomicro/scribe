@@ -2,6 +2,7 @@ package scribe
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"github.com/alecthomas/assert"
@@ -11,7 +12,8 @@ import (
 func TestScribe(t *testing.T) {
 	t.Run("Describe", func(t *testing.T) {
 		mockWrite := penname.New()
-		s := NewScribe(mockWrite, DefaultTheme)
+		s, err := NewScribe(mockWrite, DefaultTheme)
+		assert.NoError(t, err)
 
 		s.BeginDescribe("Header 1")
 		{
@@ -37,7 +39,8 @@ func TestScribe(t *testing.T) {
 
 	t.Run("Full", func(t *testing.T) {
 		mockWrite := penname.New()
-		s := NewScribe(mockWrite, DefaultTheme)
+		s, err := NewScribe(mockWrite, DefaultTheme)
+		assert.NoError(t, err)
 
 		s.BeginDescribe("Organization")
 
@@ -101,10 +104,18 @@ func TestScribe(t *testing.T) {
 			s.EndDescribe()
 		}
 
+		{
+			s.BeginDescribe("Errors")
+			{
+				s.Error(errors.New("something went wrong"))
+			}
+			s.EndDescribe()
+		}
+
 		s.EndDescribe()
 
 		a := string(mockWrite.Written())
-		e := "\nOrganization\n\n  Permissions\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  Members\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  Teams\n\n    Admins\n      Adding John\n      Adding Jane\n\n    Developers\n      Adding Jim\n      Adding Joe\n\n  Repositories\n\n    Repo 1\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    Repo 2\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n\n  Output\n      Output line 1\n      Output line 2\n\n"
+		e := "\nOrganization\n\n  Permissions\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  Members\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  Teams\n\n    Admins\n      Adding John\n      Adding Jane\n\n    Developers\n      Adding Jim\n      Adding Joe\n\n  Repositories\n\n    Repo 1\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    Repo 2\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n\n  Output\n      Output line 1\n      Output line 2\n\n\n  Errors\n      something went wrong\n"
 		assert.Equal(t, e, a)
 	})
 
@@ -116,9 +127,13 @@ func TestScribe(t *testing.T) {
 				return "\033[1;36m" + desc + "\033[0m"
 			},
 			Print: NoopDecorator,
+			Error: func(err error) string {
+				return "Error: " + err.Error()
+			},
 		}
 
-		s := NewScribe(mockWrite, theme)
+		s, err := NewScribe(mockWrite, theme)
+		assert.NoError(t, err)
 
 		s.BeginDescribe("Organization")
 
@@ -174,10 +189,18 @@ func TestScribe(t *testing.T) {
 			s.EndDescribe()
 		}
 
+		{
+			s.BeginDescribe("Errors")
+			{
+				s.Error(errors.New("something went wrong"))
+			}
+			s.EndDescribe()
+		}
+
 		s.EndDescribe()
 
 		a := string(mockWrite.Written())
-		e := "\n\x1b[1;36mOrganization\x1b[0m\n\n  \x1b[1;36mPermissions\x1b[0m\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  \x1b[1;36mMembers\x1b[0m\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  \x1b[1;36mTeams\x1b[0m\n\n    \x1b[1;36mAdmins\x1b[0m\n      Adding John\n      Adding Jane\n\n    \x1b[1;36mDevelopers\x1b[0m\n      Adding Jim\n      Adding Joe\n\n  \x1b[1;36mRepositories\x1b[0m\n\n    \x1b[1;36mRepo 1\x1b[0m\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    \x1b[1;36mRepo 2\x1b[0m\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n"
+		e := "\n\x1b[1;36mOrganization\x1b[0m\n\n  \x1b[1;36mPermissions\x1b[0m\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  \x1b[1;36mMembers\x1b[0m\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  \x1b[1;36mTeams\x1b[0m\n\n    \x1b[1;36mAdmins\x1b[0m\n      Adding John\n      Adding Jane\n\n    \x1b[1;36mDevelopers\x1b[0m\n      Adding Jim\n      Adding Joe\n\n  \x1b[1;36mRepositories\x1b[0m\n\n    \x1b[1;36mRepo 1\x1b[0m\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    \x1b[1;36mRepo 2\x1b[0m\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n\n  \x1b[1;36mErrors\x1b[0m\n      Error: something went wrong\n"
 		assert.Equal(t, e, a)
 	})
 }

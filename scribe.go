@@ -14,11 +14,16 @@ type Scribe struct {
 	theme  *Theme
 }
 
-func NewScribe(writer io.Writer, theme *Theme) Scriber {
+func NewScribe(writer io.Writer, theme *Theme) (Scriber, error) {
+	err := ValidateTheme(theme)
+	if err != nil {
+		return nil, fmt.Errorf("new scribe: %w", err)
+	}
+
 	return &Scribe{
 		writer: writer,
 		theme:  theme,
-	}
+	}, nil
 }
 
 func (s *Scribe) BeginDescribe(desc string) {
@@ -47,6 +52,12 @@ func (s *Scribe) PrintLines(buf *bytes.Buffer) {
 	}
 
 	s.println()
+	s.level--
+}
+
+func (s *Scribe) Error(err error) {
+	s.level++
+	s.printt(s.theme.Error(err))
 	s.level--
 }
 
