@@ -12,7 +12,8 @@ import (
 func TestScribe(t *testing.T) {
 	t.Run("Describe", func(t *testing.T) {
 		mockWrite := penname.New()
-		s := NewScribe(mockWrite, DefaultTheme)
+		s, err := NewScribe(mockWrite, DefaultTheme)
+		assert.NoError(t, err)
 
 		s.BeginDescribe("Header 1")
 		{
@@ -38,7 +39,8 @@ func TestScribe(t *testing.T) {
 
 	t.Run("Full", func(t *testing.T) {
 		mockWrite := penname.New()
-		s := NewScribe(mockWrite, DefaultTheme)
+		s, err := NewScribe(mockWrite, DefaultTheme)
+		assert.NoError(t, err)
 
 		s.BeginDescribe("Organization")
 
@@ -122,7 +124,8 @@ func TestScribe(t *testing.T) {
 			},
 		}
 
-		s := NewScribe(mockWrite, theme)
+		s, err := NewScribe(mockWrite, theme)
+		assert.NoError(t, err)
 
 		s.BeginDescribe("Organization")
 
