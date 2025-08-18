@@ -2,6 +2,7 @@ package scribe
 
 import (
 	"bytes"
+	"errors"
 	"testing"
 
 	"github.com/alecthomas/assert"
@@ -116,6 +117,9 @@ func TestScribe(t *testing.T) {
 				return "\033[1;36m" + desc + "\033[0m"
 			},
 			Print: NoopDecorator,
+			Error: func(err error) string {
+				return "Error: " + err.Error()
+			},
 		}
 
 		s := NewScribe(mockWrite, theme)
@@ -174,10 +178,18 @@ func TestScribe(t *testing.T) {
 			s.EndDescribe()
 		}
 
+		{
+			s.BeginDescribe("Errors")
+			{
+				s.Error(errors.New("something went wrong"))
+			}
+			s.EndDescribe()
+		}
+
 		s.EndDescribe()
 
 		a := string(mockWrite.Written())
-		e := "\n\x1b[1;36mOrganization\x1b[0m\n\n  \x1b[1;36mPermissions\x1b[0m\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  \x1b[1;36mMembers\x1b[0m\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  \x1b[1;36mTeams\x1b[0m\n\n    \x1b[1;36mAdmins\x1b[0m\n      Adding John\n      Adding Jane\n\n    \x1b[1;36mDevelopers\x1b[0m\n      Adding Jim\n      Adding Joe\n\n  \x1b[1;36mRepositories\x1b[0m\n\n    \x1b[1;36mRepo 1\x1b[0m\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    \x1b[1;36mRepo 2\x1b[0m\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n"
+		e := "\n\x1b[1;36mOrganization\x1b[0m\n\n  \x1b[1;36mPermissions\x1b[0m\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  \x1b[1;36mMembers\x1b[0m\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  \x1b[1;36mTeams\x1b[0m\n\n    \x1b[1;36mAdmins\x1b[0m\n      Adding John\n      Adding Jane\n\n    \x1b[1;36mDevelopers\x1b[0m\n      Adding Jim\n      Adding Joe\n\n  \x1b[1;36mRepositories\x1b[0m\n\n    \x1b[1;36mRepo 1\x1b[0m\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    \x1b[1;36mRepo 2\x1b[0m\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n\n  \x1b[1;36mErrors\x1b[0m\n      Error: something went wrong\n"
 		assert.Equal(t, e, a)
 	})
 }
