@@ -1,11 +1,11 @@
 package scribe
 
-import "bytes"
+import "io"
 
 type Scriber interface {
 	BeginDescribe(desc string)
 	EndDescribe()
 	Print(done string)
-	PrintLines(buf *bytes.Buffer)
+	PrintLines(r io.Reader)
 	Error(err error)
 }
