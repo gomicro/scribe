@@ -2,7 +2,6 @@ package scribe
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -42,8 +41,8 @@ func (s *Scribe) Print(str string) {
 	s.level--
 }
 
-func (s *Scribe) PrintLines(buf *bytes.Buffer) {
-	scanner := bufio.NewScanner(buf)
+func (s *Scribe) PrintLines(r io.Reader) {
+	scanner := bufio.NewScanner(r)
 
 	s.level++
 
