@@ -60,6 +60,14 @@ func (s *Scribe) Error(err error) {
 	s.level--
 }
 
+func (s *Scribe) Printf(format string, args ...any) {
+	s.Print(fmt.Sprintf(format, args...))
+}
+
+func (s *Scribe) Errorf(format string, args ...any) {
+	s.Error(fmt.Errorf(format, args...))
+}
+
 func (s *Scribe) print(str string) {
 	fmt.Fprintf(s.writer, "%v\n", str)
 }
