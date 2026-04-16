@@ -1,3 +1,8 @@
+// Package color provides ANSI escape code helpers for terminal color output.
+// Every helper function applies bold in addition to the named color — the
+// escape sequence used is [1;XXm (bold + color) rather than [XXm (color only).
+// The exported constants (FgBlack, FgRed, etc.) are plain color codes without
+// bold and can be used directly if non-bold output is needed.
 package color
 
 import "fmt"
