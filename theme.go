@@ -8,10 +8,12 @@ type Theme struct {
 	Error    func(error) string
 }
 
-var DefaultTheme = &Theme{
-	Describe: NoopDecorator,
-	Print:    NoopDecorator,
-	Error:    NoopErrDecorator,
+func DefaultTheme() *Theme {
+	return &Theme{
+		Describe: NoopDecorator,
+		Print:    NoopDecorator,
+		Error:    NoopErrDecorator,
+	}
 }
 
 var (

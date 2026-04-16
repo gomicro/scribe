@@ -1,8 +1,8 @@
 package scribe
 
 import (
-	"bytes"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/alecthomas/assert"
@@ -15,7 +15,7 @@ func TestScribe(t *testing.T) {
 	t.Run("Describe", func(t *testing.T) {
 		t.Parallel()
 		mockWrite := penname.New()
-		s, err := NewScribe(mockWrite, DefaultTheme)
+		s, err := NewScribe(mockWrite, DefaultTheme())
 		assert.NoError(t, err)
 
 		s.BeginDescribe("Header 1")
@@ -43,7 +43,7 @@ func TestScribe(t *testing.T) {
 	t.Run("Full", func(t *testing.T) {
 		t.Parallel()
 		mockWrite := penname.New()
-		s, err := NewScribe(mockWrite, DefaultTheme)
+		s, err := NewScribe(mockWrite, DefaultTheme())
 		assert.NoError(t, err)
 
 		s.BeginDescribe("Organization")
@@ -103,7 +103,7 @@ func TestScribe(t *testing.T) {
 		{
 			s.BeginDescribe("Output")
 			{
-				s.PrintLines(bytes.NewBufferString("Output line 1\nOutput line 2\n"))
+				s.PrintLines(strings.NewReader("Output line 1\nOutput line 2\n"))
 			}
 			s.EndDescribe()
 		}
