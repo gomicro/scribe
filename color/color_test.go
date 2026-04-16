@@ -7,6 +7,8 @@ import (
 )
 
 func TestColor(t *testing.T) {
+	t.Parallel()
+
 	tc := []struct {
 		name string
 		want string
@@ -56,6 +58,7 @@ func TestColor(t *testing.T) {
 
 	for _, tt := range tc {
 		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
 			assert.Equal(t, tt.want, tt.got)
 		})
 	}
