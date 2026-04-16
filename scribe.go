@@ -41,7 +41,7 @@ func (s *Scribe) EndDescribe() {
 	s.level--
 	if s.parent != nil {
 		s.mu.Lock()
-		s.parent.Write(s.buf.Bytes())
+		fmt.Fprintf(s.parent, "%s", s.buf)
 		s.mu.Unlock()
 		s.buf.Reset()
 		s.parent = nil
