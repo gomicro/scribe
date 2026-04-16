@@ -10,7 +10,10 @@ import (
 )
 
 func TestScribe(t *testing.T) {
+	t.Parallel()
+
 	t.Run("Describe", func(t *testing.T) {
+		t.Parallel()
 		mockWrite := penname.New()
 		s, err := NewScribe(mockWrite, DefaultTheme)
 		assert.NoError(t, err)
@@ -38,6 +41,7 @@ func TestScribe(t *testing.T) {
 	})
 
 	t.Run("Full", func(t *testing.T) {
+		t.Parallel()
 		mockWrite := penname.New()
 		s, err := NewScribe(mockWrite, DefaultTheme)
 		assert.NoError(t, err)
@@ -120,6 +124,7 @@ func TestScribe(t *testing.T) {
 	})
 
 	t.Run("Themed", func(t *testing.T) {
+		t.Parallel()
 		mockWrite := penname.New()
 
 		theme := &Theme{
