@@ -54,6 +54,46 @@ func TestColor(t *testing.T) {
 			want: "\033[1;37mfoo\033[0m",
 			got:  WhiteFg("foo"),
 		},
+		{
+			name: "HiBlackFg",
+			want: "\033[1;90mfoo\033[0m",
+			got:  HiBlackFg("foo"),
+		},
+		{
+			name: "HiRedFg",
+			want: "\033[1;91mfoo\033[0m",
+			got:  HiRedFg("foo"),
+		},
+		{
+			name: "HiGreenFg",
+			want: "\033[1;92mfoo\033[0m",
+			got:  HiGreenFg("foo"),
+		},
+		{
+			name: "HiYellowFg",
+			want: "\033[1;93mfoo\033[0m",
+			got:  HiYellowFg("foo"),
+		},
+		{
+			name: "HiBlueFg",
+			want: "\033[1;94mfoo\033[0m",
+			got:  HiBlueFg("foo"),
+		},
+		{
+			name: "HiMagentaFg",
+			want: "\033[1;95mfoo\033[0m",
+			got:  HiMagentaFg("foo"),
+		},
+		{
+			name: "HiCyanFg",
+			want: "\033[1;96mfoo\033[0m",
+			got:  HiCyanFg("foo"),
+		},
+		{
+			name: "HiWhiteFg",
+			want: "\033[1;97mfoo\033[0m",
+			got:  HiWhiteFg("foo"),
+		},
 	}
 
 	for _, tt := range tc {
