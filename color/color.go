@@ -2,7 +2,7 @@
 // Every helper function applies bold in addition to the named color — the
 // escape sequence used is [1;XXm (bold + color) rather than [XXm (color only).
 // The exported constants (FgBlack, FgRed, etc.) are plain color codes without
-// bold and can be used directly if non-bold output is needed.
+// bold and can be used directly when non-bold output is needed.
 package color
 
 import "fmt"
@@ -11,10 +11,14 @@ const (
 	escape = "\x1b"
 )
 
+// Reset is the ANSI code that clears all active text attributes.
 const (
 	Reset = iota
 )
 
+// Standard foreground color codes. These are plain codes without bold; pass
+// them to fmt.Sprintf directly or use the XxxFg helper functions for
+// bold+color wrapping.
 const (
 	FgBlack = iota + 30
 	FgRed
@@ -26,6 +30,7 @@ const (
 	FgWhite
 )
 
+// High-intensity foreground color codes. Same semantics as the standard set.
 const (
 	FgHiBlack = iota + 90
 	FgHiRed

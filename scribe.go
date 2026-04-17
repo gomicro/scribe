@@ -1,3 +1,8 @@
+// Package scribe provides structured, indented output for CLI tools. Output is
+// organized as a tree of named sections and leaf lines, with each nesting level
+// indented by two spaces. All visual styling is delegated to a caller-supplied
+// Theme, so the same structured output can be rendered plain or with ANSI color
+// without changing call sites.
 package scribe
 
 import (
@@ -18,6 +23,8 @@ type Scribe struct {
 	buf    *bytes.Buffer // non-nil for buffered children
 }
 
+// NewScribe creates a new Scriber that writes to writer using the given theme.
+// It returns an error if the theme fails validation (any decorator is nil).
 func NewScribe(writer io.Writer, theme *Theme) (Scriber, error) {
 	err := ValidateTheme(theme)
 	if err != nil {
