@@ -3,6 +3,7 @@ package scribe
 import (
 	"errors"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/alecthomas/assert"
@@ -207,5 +208,99 @@ func TestScribe(t *testing.T) {
 		a := string(mockWrite.Written())
 		e := "\n\x1b[1;36mOrganization\x1b[0m\n\n  \x1b[1;36mPermissions\x1b[0m\n    Enable create private repos\n    Enable create public repos\n    Base permissions [admin]\n\n  \x1b[1;36mMembers\x1b[0m\n    Adding John\n    Adding Jane\n    Adding Jim\n    Adding Joe\n\n  \x1b[1;36mTeams\x1b[0m\n\n    \x1b[1;36mAdmins\x1b[0m\n      Adding John\n      Adding Jane\n\n    \x1b[1;36mDevelopers\x1b[0m\n      Adding Jim\n      Adding Joe\n\n  \x1b[1;36mRepositories\x1b[0m\n\n    \x1b[1;36mRepo 1\x1b[0m\n      Create repo 1\n      Set branch protection\n      Set default branch to 'main'\n\n    \x1b[1;36mRepo 2\x1b[0m\n      Create repo 2\n      Set branch protection\n      Set default branch to 'foo'\n\n  \x1b[1;36mErrors\x1b[0m\n      Error: something went wrong\n"
 		assert.Equal(t, e, a)
+	})
+}
+
+func TestPrintf(t *testing.T) {
+	t.Parallel()
+
+	mockWrite := penname.New()
+	s, err := NewScribe(mockWrite, DefaultTheme())
+	assert.NoError(t, err)
+
+	s.BeginDescribe("Section")
+	s.Printf("item %d of %d", 1, 3)
+	s.EndDescribe()
+
+	a := string(mockWrite.Written())
+	e := "\nSection\n    item 1 of 3\n"
+	assert.Equal(t, e, a)
+}
+
+func TestErrorf(t *testing.T) {
+	t.Parallel()
+
+	mockWrite := penname.New()
+	s, err := NewScribe(mockWrite, DefaultTheme())
+	assert.NoError(t, err)
+
+	s.BeginDescribe("Section")
+	s.Errorf("failed after %d attempts", 3)
+	s.EndDescribe()
+
+	a := string(mockWrite.Written())
+	e := "\nSection\n    failed after 3 attempts\n"
+	assert.Equal(t, e, a)
+}
+
+func TestChild(t *testing.T) {
+	t.Parallel()
+
+	t.Run("Sequential", func(t *testing.T) {
+		t.Parallel()
+
+		mockWrite := penname.New()
+		s, err := NewScribe(mockWrite, DefaultTheme())
+		assert.NoError(t, err)
+
+		s.BeginDescribe("Parent")
+
+		child1 := s.Child("Child 1")
+		child1.Print("item a")
+		child1.EndDescribe()
+
+		child2 := s.Child("Child 2")
+		child2.Print("item b")
+		child2.EndDescribe()
+
+		s.EndDescribe()
+
+		a := string(mockWrite.Written())
+		e := "\nParent\n\n  Child 1\n      item a\n\n  Child 2\n      item b\n"
+		assert.Equal(t, e, a)
+	})
+
+	t.Run("Concurrent", func(t *testing.T) {
+		t.Parallel()
+
+		mockWrite := penname.New()
+		s, err := NewScribe(mockWrite, DefaultTheme())
+		assert.NoError(t, err)
+
+		s.BeginDescribe("Parent")
+
+		items := []string{"Alpha", "Beta", "Gamma"}
+		children := make([]Scriber, len(items))
+		for i, name := range items {
+			children[i] = s.Child(name)
+		}
+
+		var wg sync.WaitGroup
+		for i, child := range children {
+			wg.Add(1)
+			go func(c Scriber, label string) {
+				defer wg.Done()
+				c.Print("processing " + label)
+				c.EndDescribe()
+			}(child, items[i])
+		}
+		wg.Wait()
+
+		s.EndDescribe()
+
+		output := string(mockWrite.Written())
+		assert.Contains(t, output, "\n  Alpha\n      processing Alpha\n")
+		assert.Contains(t, output, "\n  Beta\n      processing Beta\n")
+		assert.Contains(t, output, "\n  Gamma\n      processing Gamma\n")
 	})
 }

@@ -2,15 +2,20 @@ package scribe
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
+	"sync"
 )
 
 type Scribe struct {
 	writer io.Writer
+	mu     *sync.Mutex
 	level  int
 	theme  *Theme
+	parent io.Writer     // non-nil for buffered children
+	buf    *bytes.Buffer // non-nil for buffered children
 }
 
 func NewScribe(writer io.Writer, theme *Theme) (Scriber, error) {
@@ -21,6 +26,7 @@ func NewScribe(writer io.Writer, theme *Theme) (Scriber, error) {
 
 	return &Scribe{
 		writer: writer,
+		mu:     &sync.Mutex{},
 		theme:  theme,
 	}, nil
 }
@@ -33,12 +39,44 @@ func (s *Scribe) BeginDescribe(desc string) {
 
 func (s *Scribe) EndDescribe() {
 	s.level--
+	if s.parent != nil {
+		s.mu.Lock()
+		fmt.Fprintf(s.parent, "%s", s.buf)
+		s.mu.Unlock()
+		s.buf.Reset()
+		s.parent = nil
+	}
+}
+
+// Child creates a new buffered Scriber labeled with desc at the current indent
+// level. All output written to the child is held in memory until EndDescribe is
+// called, at which point the entire block is written atomically to the parent's
+// writer. This allows multiple goroutines to each own a child and produce
+// grouped, non-interleaved output.
+func (s *Scribe) Child(desc string) Scriber {
+	buf := &bytes.Buffer{}
+	child := &Scribe{
+		writer: buf,
+		mu:     s.mu,
+		level:  s.level,
+		theme:  s.theme,
+		parent: s.writer,
+		buf:    buf,
+	}
+	child.println()
+	child.printt(child.theme.Describe(desc))
+	child.level++
+	return child
 }
 
 func (s *Scribe) Print(str string) {
 	s.level++
 	s.printt(s.theme.Print(str))
 	s.level--
+}
+
+func (s *Scribe) Printf(format string, args ...any) {
+	s.Print(fmt.Sprintf(format, args...))
 }
 
 func (s *Scribe) PrintLines(r io.Reader) {
@@ -58,10 +96,6 @@ func (s *Scribe) Error(err error) {
 	s.level++
 	s.printt(s.theme.Error(err))
 	s.level--
-}
-
-func (s *Scribe) Printf(format string, args ...any) {
-	s.Print(fmt.Sprintf(format, args...))
 }
 
 func (s *Scribe) Errorf(format string, args ...any) {
