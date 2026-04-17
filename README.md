@@ -19,7 +19,7 @@ go get github.com/gomicro/scribe
 ## Basic usage
 
 ```go
-s, err := scribe.NewScribe(os.Stdout, scribe.DefaultTheme)
+s, err := scribe.NewScribe(os.Stdout, scribe.DefaultTheme())
 if err != nil {
     log.Fatal(err)
 }
